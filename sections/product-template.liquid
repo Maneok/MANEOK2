@@ -1,0 +1,141 @@
+{% include 'product-template',
+  image_container_width: section.settings.image_size,
+  section_id: product.id,
+  social: section.settings.social_enable,
+  thumbnail_position: section.settings.thumbnail_position
+%}
+<!-- Start of Judge.me code -->
+      <div style='clear:both'></div>
+      <div id='judgeme_product_reviews' class='jdgm-widget jdgm-review-widget' data-product-title='{{ product.title | escape }}' data-id='{{ product.id }}' data-auto-install='false'>
+        {{ product.metafields.judgeme.widget }}
+      </div>
+      <!-- End of Judge.me code -->
+
+{% if settings.enable_product_reviews and settings.reviews_layout == 'full' %}
+  <hr id="Reviews-{{ product.id }}" class="hr--large">
+  <div class="index-section index-section--small product-reviews product-reviews--full">
+    <div class="page-width">
+      <div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+    </div>
+  </div>
+{% endif %}
+
+{% if section.settings.related_enable %}
+  {% unless isModal %}
+    {% include 'related-products' %}
+  {% endunless %}
+{% endif %}
+
+{% if section.settings.collection_links_enable and collection %}
+  {% unless isModal %}
+    {% include 'collection-navigation-links' %}
+  {% endunless %}
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Product pages",
+    "settings": [
+      {
+        "type": "select",
+        "id": "image_size",
+        "label": "Image size",
+        "default": "medium",
+        "options": [
+          {
+            "value": "small",
+            "label": "Small"
+          },
+          {
+            "value": "medium",
+            "label": "Medium"
+          },
+          {
+            "value": "large",
+            "label": "Large"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "thumbnail_position",
+        "label": "Thumbnail position",
+        "default": "beside",
+        "options": [
+          {
+            "value": "beside",
+            "label": "Next to image"
+          },
+          {
+            "value": "below",
+            "label": "Below image"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "description_style",
+        "label": "Description position",
+        "default": "default",
+        "options": [
+          {
+            "value": "default",
+            "label": "Next to images"
+          },
+          {
+            "value": "full",
+            "label": "Below images"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "social_enable",
+        "label": "Enable social sharing",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "related_enable",
+        "label": "Show related products",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "collection_links_enable",
+        "label": "Show back/next product links",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "related_count",
+        "label": "Number of related products",
+        "default": 4,
+        "min": 2,
+        "max": 5,
+        "step": 1
+      }
+    ]
+  }
+{% endschema %}
+
+
+{% if product.metafields.loox.num_reviews %}
+<script id="looxSchemaJson" type="application/ld+json">
+{
+	"@context": "http://schema.org",
+	"@type": "Product",
+  "@id": {{ canonical_url | append: '#product' | json }},
+	"@id": {{ canonical_url | json }},
+	"aggregateRating": {
+		"@type": "AggregateRating",
+		"ratingValue": "{{ product.metafields.loox.avg_rating }}",
+		"reviewCount": "{{ product.metafields.loox.num_reviews }}"
+	},
+	"name": {{ product.title | json }}
+}
+</script>
+{% endif %}
+
+
+	<div id="looxReviews" data-product-id="{{product.id}}" class="loox-reviews-default">{{ product.metafields.loox.reviews }}</div>
